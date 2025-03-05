@@ -1,5 +1,22 @@
 const fastify = require('fastify')({ logger: true });
+const mongoose = require('mongoose');
+
+
+// config env wih dotenv .env file path is src/.env
+require('dotenv').config();
+
+// Register the routes
 const userRoutes = require('./routes/user.routes'); // ✅ Import the function correctly
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((error) => {
+  console.error('Error connecting to MongoDB:', error);
+});
 
 // Register the routes
 fastify.register(userRoutes, { prefix: '/api/v1/users' });
