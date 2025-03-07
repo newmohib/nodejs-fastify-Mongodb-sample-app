@@ -7,6 +7,7 @@ require('dotenv').config();
 
 // Register the routes
 const userRoutes = require('./routes/user.routes'); // ✅ Import the function correctly
+const projectRoutes = require('./routes/project.routes');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
@@ -20,6 +21,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Register the routes
 fastify.register(userRoutes, { prefix: '/api/v1/users' });
+fastify.register(projectRoutes, { prefix: '/api/v1/projects' });
 
 const start = async () => {
   try {
