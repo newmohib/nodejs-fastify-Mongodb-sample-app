@@ -1,4 +1,5 @@
 const User = require('../models/user.model')
+const { basicAuth, verifyUser } = require('../middlewares/auth');
 
 async function getAllUsers(request, reply) {
     try {
@@ -48,10 +49,28 @@ async function deleteUser(request, reply) {
     }
 }
 
+async function login(fastify, request, reply) {
+    try {
+        const { email, password } = request.body;
+        const {isVerify, user} = await verifyUser({ email, password });
+        if (!isVerify) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+        const token = fastify.jwt.sign({ id: user._id, role: user.role, email: user.email });
+        // request.user = user;
+        reply.send({ token });
+    } catch (error) {
+        console.log(error);
+        return reply.status(401).send({ error: 'An error occured during authentication' });
+        
+    }
+}
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    login
 }

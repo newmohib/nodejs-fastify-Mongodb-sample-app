@@ -1,15 +1,22 @@
 const fastify = require('fastify')({ logger: true });
 const mongoose = require('mongoose');
-
-// 
-const {apiKeyAuth, basicAuth} = require('./middlewares/auth');
-
 // config env wih dotenv .env file path is src/.env
 require('dotenv').config();
-
-// Register the routes
+const {apiKeyAuth, basicAuth} = require('./middlewares/auth');
+// impurt the routes
 const userRoutes = require('./routes/user.routes'); // ✅ Import the function correctly
 const projectRoutes = require('./routes/project.routes');
+// import the plugins
+const jwtPlugin = require('./plugins/jwtPlugin');
+
+
+
+
+// fastify.register(require('@fastify/jwt'), {
+//     secret: process.env.JWT_SECRET,
+//   });
+
+fastify.register(jwtPlugin);
 
 // Register the middleware
 // fastify.addHook("preHandler", apiKeyAuth);

@@ -17,10 +17,7 @@ async function apiKeyAuth(request, reply) {
 
 // basic auth
 async function basicAuth(request, reply) {
-    // get and head the api key will skip the auth
-    // if (request.method === 'GET' || request.method === 'HEAD') {
-    //     return;
-    // }
+    
     const authHeader = request.headers.authorization;
     console.log("Auth:", authHeader);
     
@@ -41,13 +38,10 @@ async function basicAuth(request, reply) {
     const [email, password] = Buffer.from(authValue, 'base64').toString().split(':'); 
 
     try {
-        // verify the user
-        const user = await User.findOne({ email }).select('password');
-        const isMatch = await user.comparePassword(password);
-        if (!user || !isMatch) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        const {isVerify, user, error} = await verifyUser({ email, password });
+        if (!isVerify && error) {
+            return reply.status(401).send({error });
         }
-
         request.user = user;
     } catch (error) {
         console.log(error);
@@ -55,4 +49,21 @@ async function basicAuth(request, reply) {
         
     }
 }
-module.exports = {apiKeyAuth, basicAuth}
+async function verifyUser(params) {
+    try {
+        const { email, password } = params;
+        // verify the user
+        const user = await User.findOne({ email }).select(['password', 'role','email' ]);
+        
+        const isMatch = await user.comparePassword(password);
+        if (!user || !isMatch) {
+            return { isVerify: false,  error: 'Unauthorized'}
+        }
+        return { isVerify: true, user,  error: ''}
+    } catch (error) {
+        console.log(error);
+        return { isVerify: false,  error: 'An error occured during authentication'}
+        
+    }
+}
+module.exports = {apiKeyAuth, basicAuth, verifyUser}
