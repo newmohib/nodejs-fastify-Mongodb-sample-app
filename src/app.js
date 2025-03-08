@@ -1,6 +1,8 @@
 const fastify = require('fastify')({ logger: true });
 const mongoose = require('mongoose');
 
+// 
+const {apiKeyAuth, basicAuth} = require('./middlewares/auth');
 
 // config env wih dotenv .env file path is src/.env
 require('dotenv').config();
@@ -8,6 +10,10 @@ require('dotenv').config();
 // Register the routes
 const userRoutes = require('./routes/user.routes'); // ✅ Import the function correctly
 const projectRoutes = require('./routes/project.routes');
+
+// Register the middleware
+// fastify.addHook("preHandler", apiKeyAuth);
+// fastify.addHook("preHandler", basicAuth);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
